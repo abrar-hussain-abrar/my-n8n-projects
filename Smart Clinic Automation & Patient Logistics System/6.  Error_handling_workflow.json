@@ -1,0 +1,53 @@
+{
+  "name": "Error_handling_workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8109e24b-3dc2-428a-9856-fdaf1ff6fa7a",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2560c4a7-978e-402e-bbdc-8c5451210a02",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1517e076-10af-416e-b856-3964e74e1d24",
+  "meta": {
+    "instanceId": "ddc75da3b531681780cb5af2d1d32b67e00d355ccb1f8f729fe9c62029116bc6"
+  },
+  "id": "2j20LTnvobHdEOlJ",
+  "tags": []
+}
