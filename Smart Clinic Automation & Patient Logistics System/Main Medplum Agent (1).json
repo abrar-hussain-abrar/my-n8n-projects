@@ -1,0 +1,2353 @@
+{
+  "name": "Main Medplum Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "id": "885476bb-3a87-4c59-a139-fbba36f6d32e",
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "position": [
+        -1120,
+        288
+      ],
+      "webhookId": "ab09ca3e-53b2-4079-9ddc-bccb2f69551b",
+      "typeVersion": 1,
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "AyPnV10DvxqHWjm4",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "38aec976-a32c-4b0e-85f4-c90adc16abc9",
+              "name": "message",
+              "type": "string",
+              "value": "={{ $json.messages[0].text.body }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "82b2bdfa-81b8-4052-9a8e-5929287763b2",
+      "name": "Map text prompt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1120,
+        400
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $json.messages[0].audio.id}}"
+      },
+      "id": "5a7f2f3d-71ae-4a4f-bba4-1b1371ad3508",
+      "name": "Gets WhatsApp Voicemail Source URL",
+      "type": "n8n-nodes-base.whatsApp",
+      "position": [
+        448,
+        592
+      ],
+      "webhookId": "bbe62f3d-8788-49d4-aae6-9e9411446d44",
+      "typeVersion": 1,
+      "credentials": {
+        "whatsAppApi": {
+          "id": "BtO7HMGG0fSqDc6e",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {}
+      },
+      "id": "8b47c08c-60a8-4dab-a5e8-5494a7bb012d",
+      "name": "Download Voicemail",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        672,
+        592
+      ],
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "credentials": {
+        "whatsAppApi": {
+          "id": "BtO7HMGG0fSqDc6e",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "2fc5c912-629b-4cbe-b5e3-7e3f0651c628",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "text"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "26a3d85c-0815-48ff-85ce-713129a1107c",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "audio"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "840b95b8-6559-4fb7-b32c-651451d6d0d2",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "image"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "3e7a07f9-b785-450c-8c68-f6b276838503",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "document"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Document"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e55bb90-0152-4cbb-b251-3a898795c8ae",
+      "name": "Route Types",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        224,
+        544
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        896,
+        592
+      ],
+      "id": "3018dc4a-6f11-4a66-9291-f93542651d56",
+      "name": "Transcribe a recording",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GjSp4FdyqaYFPrHt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "dd243b81-af25-43f1-8241-bd191be6995a",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        3136,
+        896
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GjSp4FdyqaYFPrHt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "timezone": "Asia/Kolkata"
+        }
+      },
+      "id": "bd104d37-9830-44fe-a66e-d02daa46081d",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTimeTool",
+      "position": [
+        4080,
+        1904
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "985657171301835",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "cb88e8af-b9d8-4b91-ae62-fe204325a667",
+      "name": "Send message",
+      "type": "n8n-nodes-base.whatsApp",
+      "position": [
+        3680,
+        160
+      ],
+      "webhookId": "779c6e67-50cc-4757-9a96-14ab5cc1521f",
+      "typeVersion": 1,
+      "credentials": {
+        "whatsAppApi": {
+          "id": "BtO7HMGG0fSqDc6e",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\n\n\nUser's Text: {{ $('Map text prompt').item.json.message || $('Map text prompt2').item.json.message || 'No text provided' }}\n",
+        "options": {
+          "systemMessage": "=\n\nPatient Phone:\n+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\n\npateint Name:\n{{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}\n\n\nYou are a healthcare assistant router.\n\nYour job is to decide which tool group to use:\n\n- appointment_agent → booking, cancel, reschedule, doctor availability\n- patient_agent → patient lookup, create, profile\n- medical_agent → symptoms, observations, medication\n\nRules:\n- NEVER call low-level tools directly\n- ALWAYS choose the correct group\n- If unsure → ask user\n\nReturn tool call only.",
+          "passthroughBinaryImages": true
+        }
+      },
+      "id": "9f8b2be1-b090-4d85-8a2f-2e3b1c7359a3",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        3232,
+        336
+      ],
+      "typeVersion": 2.2,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "=Checks if a patient exists by phone number.\n\nALWAYS call this tool first using:\n+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\n\nDo NOT ask the user for phone number.",
+        "url": "=https://api.medplum.com/fhir/R4/Patient",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "telecom",
+              "value": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        3776,
+        1616
+      ],
+      "id": "41c6d0fa-463f-4ec0-823a-8e79b922387b",
+      "name": "medplum_patient_lookup",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Fetches available 15-minute windows. required schedule_id",
+        "url": "https://api.medplum.com/fhir/R4/Slot",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "schedule",
+              "value": "=Schedule/{{ $fromAI('schedule_id') }}"
+            },
+            {
+              "name": "status",
+              "value": "free"
+            },
+            {
+              "name": "_sort",
+              "value": "start"
+            },
+            {
+              "name": "start",
+              "value": "=gt{{ $now.toISO() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        3104,
+        1760
+      ],
+      "id": "0a6b1ff4-b555-4e5b-85fc-89e571b4f5af",
+      "name": "get_doctor_slots",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Saves a medical symptom or log to the patient file.",
+        "method": "POST",
+        "url": "https://api.medplum.com/fhir/R4/Observation",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"resourceType\": \"Observation\",\n  \"status\": \"final\",\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"http://loinc.org\",\n        \"code\": \"11488-4\",\n        \"display\": \"Consultation note\"\n      }\n    ],\n    \"text\": \"AI Chat Symptom Log\"\n  },\n  \"subject\": {\n    \"reference\": \"Patient/{{ $fromAI('patient_id') }}\"\n  },\n  \"valueString\": \"{{ $fromAI('symptom_description') }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        3440,
+        1600
+      ],
+      "id": "48e2b8ea-a554-48f0-9933-cd9689d642fa",
+      "name": "record_observation",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Books a medical appointment. Requires a Patient ID and a Slot ID doctor ID ,start and end time. Use this after the patient confirms a specific time.\nThe UUID of the patient (e.g., 74614c48-4d88-404b-803f-a95886761471). DO NOT use the patient's name. If you do not have the UUID, call the 'search_patient' tool first.\n",
+        "method": "POST",
+        "url": "https://api.medplum.com/fhir/R4/Appointment",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"resourceType\": \"Appointment\",\n  \"status\": \"booked\",\n  \"start\": \"{{ $fromAI('start_time') }}\",\n  \"end\": \"{{ $fromAI('end_time') }}\",\n  \"description\": \"Patient Appointment\",\n  \"slot\": [\n    {\n      \"reference\": \"Slot/{{ $fromAI('slot_id').replace('slot-', '') }}\"\n    }\n  ],\n  \"participant\": [\n    {\n      \"actor\": {\n        \"reference\": \"Practitioner/{{ $fromAI('doctor_id') }}\",\n        \"display\": \"{{ $fromAI('doctor_name') }}\"\n      },\n      \"status\": \"accepted\"\n    },\n    {\n      \"actor\": {\n        \"reference\": \"Patient/{{ $fromAI('patient_id') }}\",\n        \"display\": \"{{ $fromAI('patient_name') }}\"\n      },\n      \"status\": \"accepted\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        2512,
+        1792
+      ],
+      "id": "17d6d147-27f9-44a2-b9ba-f4d428005302",
+      "name": "book_appointment",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Updates an appointment status or time. Requires 'appointment_id' and 'status' or 'new_slot_id'.",
+        "method": "PATCH",
+        "url": "=https://api.medplum.com/fhir/R4/Appointment/{{$fromAI(\"appointment_id\")}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "[\n  {\n    \"op\": \"replace\",\n    \"path\": \"/status\",\n    \"value\": \"{{ $fromAI('status', 'booked') }}\"\n  },\n  {\n    \"op\": \"replace\",\n    \"path\": \"/slot/0/reference\",\n    \"value\": \"Slot/{{ $fromAI('new_slot_id') }}\"\n  }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        2336,
+        1792
+      ],
+      "id": "67901ae5-0fc8-4b55-8c7d-0affe20e588c",
+      "name": "cancel_or_reschedule_appointment",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use the get the doctors(practitioners) details like name, pract id etc ",
+        "url": "https://api.medplum.com/fhir/R4/PractitionerRole",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "_include",
+              "value": "PractitionerRole:practitioner"
+            },
+            {
+              "name": "organization",
+              "value": "=Organization/org-{{ $fromAI('organization_id') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        2960,
+        1760
+      ],
+      "id": "77bbbb65-60d1-4b79-a8df-3f5991c9418b",
+      "name": "get_clinic_staff",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Creates a new patient record. Use this if medplum_patient_lookup fails to find a user",
+        "method": "POST",
+        "url": "https://api.medplum.com/fhir/R4/Patient",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"resourceType\": \"Patient\",\n    \"name\": [\n      {\n        \"given\": [\"{{ $fromAI('first_name') }}\"],\n        \"family\": \"{{ $fromAI('last_name') }}\"\n      }\n    ],\n    \"telecom\": [\n      {\n        \"system\": \"phone\",\n        \"value\": \"{{ $fromAI('phone_number') }}\",\n        \"use\": \"mobile\"\n      }\n    ],\n    \"gender\": \"{{ $fromAI('gender', 'unknown') }}\"\n  }\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        4080,
+        1456
+      ],
+      "id": "11734e72-3e4a-4471-a8c4-f978013e74af",
+      "name": "create_patient",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use to get Organization context like id, name",
+        "url": "https://api.medplum.com/fhir/R4/Organization",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "identifier",
+              "value": "={{$fromAI(\"Clinic_number\")}}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        3904,
+        1456
+      ],
+      "id": "15e9b20e-249f-46db-8b90-05a9f55f45f2",
+      "name": "Get_Organization_context",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use to verify if a booking actually exists and what the current status is",
+        "url": "=https://api.medplum.com/fhir/R4/Appointment/{{ $fromAI('appointment_id') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        2176,
+        1808
+      ],
+      "id": "a15bb56e-7fb7-4910-891a-5e112bae96ca",
+      "name": "get_appinment",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "This tool allows the you to verify if a booking actually exists and what the current status is.",
+        "url": "https://api.medplum.com/fhir/R4/Observation",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "subject",
+              "value": "=Patient/{{ $fromAI('patient_id') }}"
+            },
+            {
+              "name": "_sort",
+              "value": "-_lastUpdated"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        3264,
+        1600
+      ],
+      "id": "3e9b50c6-e38a-48ba-ab72-ab6d7dc20e2b",
+      "name": "get_observation",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Instead of just searching by phone number, this tool lets the you pull the full profile to confirm it has the right person.",
+        "url": "=https://api.medplum.com/fhir/R4/Patient/{{ $fromAI('patient_id') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        4256,
+        1472
+      ],
+      "id": "44da937c-dd2d-4377-ba88-ecf1c2f2fe38",
+      "name": "get_pateint_summary"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use the slot_id to mark it busy.",
+        "method": "PATCH",
+        "url": "=https://api.medplum.com/fhir/R4/Slot/{{ $fromAI('slot_id') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json-patch+json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "[{\"op\": \"replace\", \"path\": \"/status\", \"value\": \"busy\"}]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        2672,
+        1792
+      ],
+      "id": "00b9ab9f-9a72-43e4-9c7e-56bd1823ef69",
+      "name": "update_slot_status",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "zQflNekkLeM1sDWU",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/zQflNekkLeM1sDWU",
+          "cachedResultName": "My Sub-Workflow 1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "appointment_id",
+              "displayName": "appointment_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "old_slot_id",
+              "displayName": "old_slot_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "new_slot_id",
+              "displayName": "new_slot_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1984,
+        1808
+      ],
+      "id": "2573b938-4ff9-47da-ba1a-fd3dc7840e19",
+      "name": "reschedule_appointment"
+    },
+    {
+      "parameters": {
+        "url": "sdsdsds",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"resourceType\": \"MedicationRequest\",\n  \"status\": \"active\",\n  \"intent\": \"order\",\n  \"subject\": { \n    \"reference\": \"Patient/{{ $json.patient_id }}\" \n  },\n  \"medicationCodeableConcept\": {\n    \"text\": \"{{ $json.name }}\"\n  },\n  \"dosageInstruction\": [\n    {\n      \"text\": \"{{ $json.dose }}\",\n      \"timing\": {\n        \"repeat\": {\n          \"timeOfDay\": [ \"{{ $json.time }}\" ]\n        }\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        3616,
+        1600
+      ],
+      "id": "a1a62834-f757-49d8-b794-98c42dcad6c7",
+      "name": "save_medication_request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "38aec976-a32c-4b0e-85f4-c90adc16abc9",
+              "name": "message",
+              "type": "string",
+              "value": "={{ $json.content.parts[0].text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cc76c84d-f5ab-4949-947d-1bcaed46154c",
+      "name": "Map text prompt2",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1120,
+        592
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "OWfvyE2qLnf4J72A",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/OWfvyE2qLnf4J72A",
+          "cachedResultName": "Document Upload Workflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "mediaId",
+              "displayName": "mediaId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "patientId",
+              "displayName": "patientId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        960
+      ],
+      "id": "2087d8e3-7f64-464a-b73e-76dad7cc11f5",
+      "name": "Call 'Document Upload Workflow'"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use to get the doctor schedule . required doctor_id",
+        "url": "https://api.medplum.com/fhir/R4/Schedule",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "actor",
+              "value": "=Practitioner/{{ $fromAI(\"doctor_id\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        2784,
+        1712
+      ],
+      "id": "e2739086-6e42-41f5-930c-c4de65e9987e",
+      "name": "get_schedule",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=memory:{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "sessionTTL": 200,
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        3168,
+        832
+      ],
+      "id": "5a494d86-4c21-4d00-a936-934f66bb2ae9",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "rSuUsUMAxEmXIpIr",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this tool to retrieve relevant past medical history\nfor a patient using semantic search.",
+        "tableName": {
+          "__rl": true,
+          "value": "patient_memory",
+          "mode": "list",
+          "cachedResultName": "patient_memory"
+        },
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "patient_phone",
+                "value": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        4720,
+        1152
+      ],
+      "id": "5a9cb513-3242-4c32-b8fc-df8022d718c2",
+      "name": "retrieve_patient_memory",
+      "credentials": {
+        "supabaseApi": {
+          "id": "7TrnuvmL0x69w5mQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.fact }}",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "=patient_phone",
+                "value": "+923036781966"
+              },
+              {
+                "name": "memory_text",
+                "value": "={{ $json.fact}}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        5744,
+        752
+      ],
+      "id": "b254ddcf-0f1a-4b52-b227-6ac21260c9cc",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        5472,
+        1632
+      ],
+      "id": "946b10f9-8014-4885-af05-ba975b9b6148",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GjSp4FdyqaYFPrHt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        5824,
+        960
+      ],
+      "id": "89b21bf8-1a0d-4867-8d84-4c3f63237530",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "patient_memory",
+          "mode": "list",
+          "cachedResultName": "patient_memory"
+        },
+        "options": {
+          "queryName": ""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        5648,
+        528
+      ],
+      "id": "bed0a7d8-eedc-4375-b523-7f9e449d7346",
+      "name": "save_patient_memory",
+      "credentials": {
+        "supabaseApi": {
+          "id": "7TrnuvmL0x69w5mQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Message:\n{{ $json.message }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=Classify the user's message into one of these categories:  \n- medical - greeting - spam - irrelevant \nRules: - \"medical\" → symptoms, illness, medicine, health, appointment questions\n - \"greeting\" → hi, hello, salam, etc \n- \"spam\" → repeated, abusive, nonsense, too frequent \n- \"irrelevant\" → anything not related to healthcare \n\n Must Return ONLY a plain word (no JSON, no explanation):\n\nmedical OR greeting OR spam OR irrelevant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        -288
+      ],
+      "id": "ead0ab39-5c7a-4343-b4a2-13c37c37e961",
+      "name": "Analyze the intent",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GjSp4FdyqaYFPrHt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "blocked_users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "keyValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            },
+            {
+              "keyName": "blocked",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        384
+      ],
+      "id": "4adb209c-010e-4f63-b41c-c8910fa7333a",
+      "name": "Get a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "7TrnuvmL0x69w5mQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "incr",
+        "key": "=rate_limit:{{ $json.contacts[0].wa_id }}",
+        "expire": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        176
+      ],
+      "id": "ef9c6b75-8150-41be-ba25-99e49f4bab3a",
+      "name": "check_rate_limit",
+      "credentials": {
+        "redis": {
+          "id": "rSuUsUMAxEmXIpIr",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "667d34d5-9d85-4043-aae5-b176e456a3b7",
+              "leftValue": "={{ $json.values().first() }}",
+              "rightValue": 15,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -672,
+        176
+      ],
+      "id": "4fc8ff50-7475-46f3-b093-2f85d265ca7e",
+      "name": "validate_limit"
+    },
+    {
+      "parameters": {
+        "operation": "incr",
+        "key": "=spam_count:{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "expire": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        96
+      ],
+      "id": "a59d1b2a-bd22-4b19-ba31-ac770f276b46",
+      "name": "check_spam_count",
+      "credentials": {
+        "redis": {
+          "id": "rSuUsUMAxEmXIpIr",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d3ef14d3-bfa8-4bce-b243-bd65c2ff846d",
+              "leftValue": "={{ $json.values().first() }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "ab2c0eee-6fae-4e5d-b2ec-972e8009e441",
+      "name": "validate_spam_count"
+    },
+    {
+      "parameters": {
+        "tableId": "blocked_users",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            },
+            {
+              "fieldId": "blocked",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "692e60c3-fb19-4967-a6b8-0786b428e38c",
+      "name": "block_user",
+      "retryOnFail": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "7TrnuvmL0x69w5mQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "985657171301835",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "⚠️ We’re receiving too many requests from your number. To ensure fair usage for everyone, please wait a few moments before continuing.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "a5ea79f9-1ae0-4e87-9219-1d169573e241",
+      "name": "send_warning_message",
+      "webhookId": "c7a7ced4-48a3-4d49-ba0f-9fc55d36b12e",
+      "retryOnFail": true,
+      "credentials": {
+        "whatsAppApi": {
+          "id": "BtO7HMGG0fSqDc6e",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "985657171301835",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "🚫 You have been temporarily blocked due to excessive activity. Please try again after some time.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        128
+      ],
+      "id": "93ef87f8-7d43-48a4-8c6d-a2bad8116778",
+      "name": "send_user_block_message",
+      "webhookId": "c7a7ced4-48a3-4d49-ba0f-9fc55d36b12e",
+      "retryOnFail": true,
+      "credentials": {
+        "whatsAppApi": {
+          "id": "BtO7HMGG0fSqDc6e",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0fa389db-8f80-4336-ae97-4af05990b5e0",
+              "leftValue": "={{$json.isNotEmpty() }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        384
+      ],
+      "id": "895bf750-2caf-4904-a77a-3bbb6c41540c",
+      "name": "isUserBlock"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        448,
+        128
+      ],
+      "id": "6bdc109d-10fb-4203-8606-e522f9350f14",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        0,
+        576
+      ],
+      "id": "dd460393-dc13-490b-8791-ea4bd037fc0e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "let intent =$input.first().json.content.parts[0].text;\n\n// remove quotes + spaces\nintent = intent.replace(/\"/g, '').trim().toLowerCase();\n\n// safety fallback\nconst allowed = [\"medical\", \"greeting\", \"spam\", \"irrelevant\"];\nif (!allowed.includes(intent)) {\n  intent = \"irrelevant\";\n}\n\nreturn [\n  {\n    json: {\n      intent\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        -304
+      ],
+      "id": "467e6fad-20f2-411e-a1f1-1648096e67f3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "=greeting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "64310b50-d026-4b91-9a3a-349e89a323fc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Greeting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d7ddf3b6-8d8a-474d-b252-2eaff7c2ae77",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "medical",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Medical"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f14fab1b-3d90-451f-a550-5e9198bcdab6",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Spam"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5cacb831-fc97-49d2-8577-19280e09374d",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "irrelevant",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "irrelevent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1936,
+        -320
+      ],
+      "id": "681cbb9f-8a7d-41ed-ae9b-0b7fc28861dc",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "985657171301835",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "🤖 I’m here to help with healthcare-related questions. How can I assist you today?",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        2224,
+        -288
+      ],
+      "id": "197668a0-b1ce-474a-99cb-35ccf17902f9",
+      "name": "Send message1",
+      "webhookId": "8eb69f2a-6359-4f30-9f5a-09329aad94ab",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "BtO7HMGG0fSqDc6e",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "985657171301835",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "⚠️ spam request detected. Continued activity may result in temporary restriction.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        2208,
+        -416
+      ],
+      "id": "fcfb3393-2be3-4009-8441-da6005db8ed5",
+      "name": "Send message2",
+      "webhookId": "41b36e5f-38b4-4c9a-a8d6-10945966a4a0",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "BtO7HMGG0fSqDc6e",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemma-3-1b-it",
+          "mode": "list",
+          "cachedResultName": "models/gemma-3-1b-it"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=\"Extract important medical facts, symptoms, or patient preferences from this conversation. If the message is just a greeting or general pleasantry, return 'IGNORE'.\n\n{{ $json.output }}\n\n\"Extract medical data. Return JSON format:\n{\n\"save_required\": boolean,\n\"fact\": \"string\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        4112,
+        320
+      ],
+      "id": "db670a6d-c2ce-4dd5-aafd-e9bd5d11bfc2",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GjSp4FdyqaYFPrHt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add this in a Code Node if the output is a raw string\nconst rawString = $input.first().json.content.parts[0].text; \nconst jsonMatch = rawString.match(/\\{[\\s\\S]*\\}/);\nif (jsonMatch) {\n  return JSON.parse(jsonMatch[0]);\n}\nreturn { save_required: false };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5168,
+        528
+      ],
+      "id": "b297d610-a7a4-46b1-b99d-87a81df46460",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6919f15e-5616-4eaa-b760-c4e1590b703c",
+              "leftValue": "={{ $json.save_required }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        5392,
+        528
+      ],
+      "id": "c30774cf-01b6-41af-a10f-be273a57a577",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "url": "https://api.medplum.com/fhir/R4/Organization",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "identifier",
+              "value": "+15551432632"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2736,
+        2144
+      ],
+      "id": "f63a9bbc-b3df-42b4-aaee-f3cc656f567e",
+      "name": "HTTP Request",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "2YwThcaYqifoCMnR",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $fromAI('input') }}",
+        "options": {
+          "systemMessage": "=Role: You are the Clinical Assistant for \"LifeCare Digital Clinic\".\n\nYour responsibility:\n- Record symptoms\n- Retrieve medical history\n- Log medications\n\nPatient Identity Rule (CRITICAL):\n\n- The patient's phone number is already available:\n  +{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\n\n- The patient's name is already available:\n  {{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}\n\n- NEVER ask the user again for phone number\n- NEVER ask for full name unless creating a new patient\n\n- ALWAYS use this phone number when calling medplum_patient_lookup\n---\n\nPhase 1: Patient Verification\n→ Call medplum_patient_lookup\n\nIf not found:\n→ STOP and say:\n\"Please register first before medical assistance.\"\n\n---\n\nPhase 2: Symptom Logging\n- If patient describes symptoms:\n→ Call record_observation immediately\n\n---\n\nPhase 3: Medical History\n- If user asks about past symptoms/history:\n→ Call retrieve_patient_memory\n→ Optionally call get_observation\n\n---\n\nPhase 4: Medication\n- If user mentions medicine:\n→ Call save_medication_request\n\n---\n\nRules:\n- Be empathetic and professional\n- Never hallucinate medical data\n- Always store useful clinical data\n- Do not handle appointments"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        3376,
+        1008
+      ],
+      "id": "2c8270a5-42b3-4dc7-a855-bcb6a614eac9",
+      "name": "medical_agent"
+    },
+    {
+      "parameters": {
+        "text": "={{ $fromAI('input') }}",
+        "options": {
+          "systemMessage": "=Role: You are the Patient Manager for \"LifeCare Digital Clinic\".\n\nYour responsibility:\n- Identify patient\n- Register new patients\n- Provide patient profile info\n\nPatient Identity Rule (CRITICAL):\n\n- The patient's phone number is already available:\n  +{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\n\n- The patient's name is already available:\n  {{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}\n\n- NEVER ask the user again for phone number\n- NEVER ask for full name unless creating a new patient\n\n- ALWAYS use this phone number when calling medplum_patient_lookup\n\nPhase 1: Clinic Context\n→ Call Get_Organization_context\n\n---\n\nPhase 2: Patient Lookup\n→ Call medplum_patient_lookup\n\nIF FOUND:\n→ Greet:\n\"Welcome back, [Name]!\"\n\nIF NOT FOUND:\n→ Ask:\n\"Please provide:\n- First Name\n- Last Name\n- Gender\"\n\n→ Then call create_patient\n\n---\n\nPhase 3: Patient Info\n- If user asks for profile:\n→ Call get_pateint_summary\n\n---\n\nRules:\n- Always use E.164 format (+92...)\n- Never hallucinate patient data\n- Do not handle appointments\n- Do not handle symptoms"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        3856,
+        992
+      ],
+      "id": "0c247308-a10a-43ac-a064-278d9a600b94",
+      "name": "patient_agent"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Map text prompt').item.json.message }}",
+        "options": {
+          "systemMessage": "=Role: You are the Appointment Manager for \"LifeCare Digital Clinic\".\n\nYour responsibility:\n- Handle appointment booking, cancellation, and rescheduling\n- Show doctors and available time slots\n\nPatient Identity Rule (CRITICAL):\n\n- The patient's phone number is already available:\n  +{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\n\n- The patient's name is already available:\n  {{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}\n\n- NEVER ask the user again for phone number\n- NEVER ask for full name unless creating a new patient\n\n- ALWAYS use this phone number when calling medplum_patient_lookup\nDO NOT ask for information already available in system context.\n\nIf phone number exists → use it directly.\n\nPhase 1: Clinic Context (MANDATORY)\n- Always call Get_Organization_context using clinic number:\n+{{ $('WhatsApp Trigger').item.json.metadata.display_phone_number }}\n\n---\n\nPhase 2: Patient Verification\n- Call medplum_patient_lookup using phone number\n- If NOT found → STOP and inform:\n  \"You are not registered. Please register first.\"\n\n---\n\nPhase 3: Appointment Flow\n\n1. Get Doctors:\n→ Call get_clinic_staff\n\n2. Get Schedule:\n→ Call get_schedule using doctor_id\n\n3. Get Available Slots:\n→ Call get_doctor_slots using schedule_id\n\n⚠️ IMPORTANT:\n- Convert UTC time to Pakistan time (UTC+5)\nExample:\n11:00Z → 4:00 PM\n12:00Z → 5:00 PM\n\n---\n\n4. Booking:\n- After user confirms:\n→ Call book_appointment\n→ Then immediately call update_slot_status\n\n---\n\n5. Modify Appointment:\n- Cancel / Reschedule:\n→ Call cancel_or_reschedule_appointment\n\n---\n\nRules:\n- NEVER guess IDs\n- ALWAYS use tool-returned UUIDs\n- NEVER call patient creation\n- Always present human-readable time"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        2736,
+        1008
+      ],
+      "id": "3f2d1ac0-82b7-4a97-b792-d052f0a962f0",
+      "name": "appointment_agent"
+    },
+    {
+      "parameters": {
+        "description": "call this tool to book an appointment",
+        "workflowId": {
+          "__rl": true,
+          "value": "dN8XUj5IKSoDkhTI",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/dN8XUj5IKSoDkhTI",
+          "cachedResultName": "Appointment_booking_agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3008,
+        688
+      ],
+      "id": "9bb474ca-271a-4ad7-b3c1-086def225561",
+      "name": "appointment_agent1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "check_rate_limit",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gets WhatsApp Voicemail Source URL": {
+      "main": [
+        [
+          {
+            "node": "Download Voicemail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Voicemail": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Types": {
+      "main": [
+        [
+          {
+            "node": "Map text prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gets WhatsApp Voicemail Source URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Document Upload Workflow'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "medical_agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "patient_agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "patient_agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "medical_agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "medplum_patient_lookup": {
+      "ai_tool": [
+        [
+          {
+            "node": "patient_agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "medical_agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_doctor_slots": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "record_observation": {
+      "ai_tool": [
+        [
+          {
+            "node": "medical_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "book_appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancel_or_reschedule_appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_clinic_staff": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_patient": {
+      "ai_tool": [
+        [
+          {
+            "node": "patient_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_Organization_context": {
+      "ai_tool": [
+        [
+          {
+            "node": "patient_agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_appinment": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_observation": {
+      "ai_tool": [
+        [
+          {
+            "node": "medical_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_pateint_summary": {
+      "ai_tool": [
+        [
+          {
+            "node": "patient_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_slot_status": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reschedule_appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map text prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save_medication_request": {
+      "ai_tool": [
+        [
+          {
+            "node": "medical_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Map text prompt2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map text prompt2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_schedule": {
+      "ai_tool": [
+        [
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "medical_agent",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "patient_agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retrieve_patient_memory": {
+      "ai_tool": [
+        [
+          {
+            "node": "patient_agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "medical_agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "appointment_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "save_patient_memory",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "save_patient_memory",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "retrieve_patient_memory",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze the intent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "isUserBlock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_rate_limit": {
+      "main": [
+        [
+          {
+            "node": "validate_limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate_limit": {
+      "main": [
+        [
+          {
+            "node": "check_spam_count",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_spam_count": {
+      "main": [
+        [
+          {
+            "node": "validate_spam_count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate_spam_count": {
+      "main": [
+        [
+          {
+            "node": "block_user",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "send_warning_message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "block_user": {
+      "main": [
+        [
+          {
+            "node": "send_user_block_message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isUserBlock": {
+      "main": [
+        [
+          {
+            "node": "send_user_block_message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send_user_block_message": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Route Types",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [],
+        [
+          {
+            "node": "Send message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        []
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "save_patient_memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "medical_agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "patient_agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "appointment_agent": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "appointment_agent1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cc4d42c1-f05a-4044-9c0c-cef6a48e0655",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ddc75da3b531681780cb5af2d1d32b67e00d355ccb1f8f729fe9c62029116bc6"
+  },
+  "id": "QKFRHrAxByvyIxgO",
+  "tags": []
+}
